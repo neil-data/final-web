@@ -1,0 +1,152 @@
+import { Metadata } from 'next';
+import { GlassCard } from '@/components/ui/GlassCard';
+import { SectionTitle } from '@/components/ui/SectionTitle';
+import { Mail, MapPin, Phone, Linkedin, Instagram, Twitter, Github, Youtube } from 'lucide-react';
+
+export const metadata: Metadata = {
+  title: 'Contact — GDGOC IAR',
+  description: 'Get in touch with GDGOC at the Institute of Advanced Research.',
+};
+
+const socials = [
+  { Icon: Github, label: 'GitHub', href: '#', color: 'hover:text-white' },
+  { Icon: Linkedin, label: 'LinkedIn', href: '#', color: 'hover:text-g-blue' },
+  { Icon: Instagram, label: 'Instagram', href: '#', color: 'hover:text-g-red' },
+  { Icon: Twitter, label: 'Twitter', href: '#', color: 'hover:text-g-blue' },
+  { Icon: Youtube, label: 'YouTube', href: '#', color: 'hover:text-g-red' },
+];
+
+export default function ContactPage() {
+  return (
+    <div className="pt-20">
+      {/* Hero */}
+      <section className="relative py-20 border-b border-white/5 overflow-hidden">
+        <div className="absolute inset-0 dot-grid opacity-20" />
+        <div className="bg-number">CONTACT</div>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          <div className="section-number mb-4">01 — Get In Touch</div>
+          <h1 className="font-heading text-5xl md:text-6xl font-bold tracking-tight leading-none mb-4">
+            Let&apos;s <span className="google-gradient-text">Connect</span>
+          </h1>
+          <p className="text-white/45 text-lg max-w-xl">
+            Have a question, partnership proposal, or just want to say hello? We&apos;d love to hear from you.
+          </p>
+        </div>
+      </section>
+
+      <section className="py-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid lg:grid-cols-5 gap-8">
+            {/* Contact Form */}
+            <div className="lg:col-span-3">
+              <GlassCard animate={false}>
+                <h2 className="font-heading text-lg font-bold text-white mb-6">Send a Message</h2>
+                <form className="space-y-5">
+                  <div className="grid sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-xs font-mono uppercase tracking-widest text-white/40 mb-2">Your Name</label>
+                      <input type="text" placeholder="John Doe" className="form-input" />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-mono uppercase tracking-widest text-white/40 mb-2">Email Address</label>
+                      <input type="email" placeholder="you@example.com" className="form-input" />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-mono uppercase tracking-widest text-white/40 mb-2">Subject</label>
+                    <select className="form-input">
+                      <option className="bg-dark-card">General Inquiry</option>
+                      <option className="bg-dark-card">Event Collaboration</option>
+                      <option className="bg-dark-card">Partnership / Sponsorship</option>
+                      <option className="bg-dark-card">Feedback</option>
+                      <option className="bg-dark-card">Join the Team</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-mono uppercase tracking-widest text-white/40 mb-2">Message</label>
+                    <textarea
+                      rows={5}
+                      placeholder="Tell us how we can help..."
+                      className="form-input resize-none"
+                    />
+                  </div>
+                  <button
+                    type="submit"
+                    className="btn-skew bg-g-blue border border-g-blue text-white text-xs font-mono uppercase tracking-widest px-8 py-3 hover:bg-g-blue/80 transition-all w-full"
+                  >
+                    <span>Send Message</span>
+                  </button>
+                </form>
+              </GlassCard>
+            </div>
+
+            {/* Info */}
+            <div className="lg:col-span-2 space-y-4">
+              <GlassCard animate={false}>
+                <h3 className="section-number mb-4">Contact Info</h3>
+                <div className="space-y-4">
+                  <div className="flex gap-3">
+                    <Mail size={16} className="text-g-blue mt-0.5 flex-shrink-0" />
+                    <div>
+                      <div className="text-xs font-mono text-white/35 mb-0.5">Email</div>
+                      <a href="mailto:gdgoc@iar.ac.in" className="text-white text-sm hover:text-g-blue transition-colors">gdgoc@iar.ac.in</a>
+                    </div>
+                  </div>
+                  <div className="flex gap-3">
+                    <Phone size={16} className="text-g-green mt-0.5 flex-shrink-0" />
+                    <div>
+                      <div className="text-xs font-mono text-white/35 mb-0.5">Phone</div>
+                      <span className="text-white text-sm">+91 98765 43210</span>
+                    </div>
+                  </div>
+                  <div className="flex gap-3">
+                    <MapPin size={16} className="text-g-red mt-0.5 flex-shrink-0" />
+                    <div>
+                      <div className="text-xs font-mono text-white/35 mb-0.5">Location</div>
+                      <span className="text-white text-sm leading-relaxed">Institute of Advanced Research<br />Koba Institutional Area<br />Gandhinagar, Gujarat 382426</span>
+                    </div>
+                  </div>
+                </div>
+              </GlassCard>
+
+              <GlassCard animate={false}>
+                <h3 className="section-number mb-4">Follow Us</h3>
+                <div className="grid grid-cols-5 gap-2">
+                  {socials.map(({ Icon, label, href, color }) => (
+                    <a
+                      key={label}
+                      href={href}
+                      aria-label={label}
+                      className={`flex flex-col items-center gap-1.5 py-3 rounded-lg border border-white/5 hover:border-white/15 text-white/30 ${color} transition-all`}
+                    >
+                      <Icon size={15} />
+                      <span className="text-[9px] font-mono">{label}</span>
+                    </a>
+                  ))}
+                </div>
+              </GlassCard>
+
+              <GlassCard animate={false}>
+                <h3 className="section-number mb-4">Operating Hours</h3>
+                <div className="space-y-2 text-xs font-mono">
+                  <div className="flex justify-between">
+                    <span className="text-white/40">Mon – Fri</span>
+                    <span className="text-white/70">10:00 AM – 6:00 PM</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-white/40">Saturday</span>
+                    <span className="text-white/70">11:00 AM – 4:00 PM</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-white/40">Sunday</span>
+                    <span className="text-white/40">Closed</span>
+                  </div>
+                </div>
+              </GlassCard>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  );
+}
