@@ -1,3 +1,5 @@
+'use client';
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { GlassCard } from '@/components/ui/GlassCard';
 import { Badge } from '@/components/ui/Badge';
@@ -5,10 +7,14 @@ import { mockLeaderboard } from '@/data/leaderboard';
 import { getBadgeColor } from '@/lib/utils';
 import { Trophy, Star } from 'lucide-react';
 
-const currentUserRank = 17;
-const currentUser = mockLeaderboard.find(e => e.rank === currentUserRank)!;
-
 export default function StudentLeaderboardPage() {
+  const [userName, setUserName] = useState('');
+
+  useEffect(() => {
+    const raw = localStorage.getItem('gdgoc-student-session');
+    if (raw) setUserName(JSON.parse(raw).name || '');
+  }, []);
+
   return (
     <div className="p-6 md:p-8 max-w-3xl mx-auto">
       <div className="mb-8">
@@ -24,16 +30,14 @@ export default function StudentLeaderboardPage() {
         <div className="flex-1">
           <div className="text-xs font-mono text-white/40 uppercase tracking-widest mb-1">Your Current Rank</div>
           <div className="flex items-center gap-3">
-            <span className="font-heading text-4xl font-bold text-g-yellow">#{currentUser.rank}</span>
+            <span className="font-heading text-4xl font-bold text-g-yellow">—</span>
             <div>
-              <div className="text-sm text-white font-medium">{currentUser.name}</div>
-              <div className="flex items-center gap-1 text-xs text-g-yellow font-mono"><Star size={10} />{currentUser.points.toLocaleString()} points</div>
+              <div className="text-sm text-white font-medium">{userName || 'Student'}</div>
+              <div className="flex items-center gap-1 text-xs text-white/40 font-mono"><Star size={10} />Not ranked yet</div>
             </div>
           </div>
         </div>
-        <Badge variant={getBadgeColor(currentUser.badge)} className="hidden sm:inline-flex capitalize">
-          {currentUser.badge.replace('-', ' ')}
-        </Badge>
+        <Badge variant="blue" className="hidden sm:inline-flex">Member</Badge>
       </GlassCard>
 
       {/* Full list */}
@@ -48,32 +52,29 @@ export default function StudentLeaderboardPage() {
             </tr>
           </thead>
           <tbody>
-            {mockLeaderboard.map((entry) => {
-              const isMe = entry.rank === currentUserRank;
-              return (
-                <tr key={entry.userId} className={isMe ? 'bg-g-yellow/5' : ''}>
-                  <td>
-                    <span className={`font-mono text-xs ${isMe ? 'text-g-yellow font-bold' : 'text-white/40'}`}>#{entry.rank}</span>
-                  </td>
-                  <td>
-                    <div className="flex items-center gap-3">
-                      <div className="relative w-7 h-7 rounded-full overflow-hidden border border-white/10 flex-shrink-0">
-                        <Image src={entry.avatar} alt={entry.name} fill className="object-cover" />
-                      </div>
-                      <div>
-                        <span className={`text-sm font-medium ${isMe ? 'text-g-yellow' : 'text-white'}`}>{entry.name}</span>
-                        {isMe && <span className="ml-2 text-[10px] font-mono text-g-yellow/60 uppercase">(You)</span>}
-                      </div>
+            {mockLeaderboard.map((entry) => (
+              <tr key={entry.userId}>
+                <td>
+                  <span className="font-mono text-xs text-white/40">#{entry.rank}</span>
+                </td>
+                <td>
+                  <div className="flex items-center gap-3">
+                    <div className="relative w-7 h-7 rounded-full overflow-hidden border border-white/10 flex-shrink-0">
+                      <Image src={entry.avatar} alt={entry.name} fill className="object-cover" />
                     </div>
-                  </td>
-                  <td className="text-right hidden sm:table-cell">
-                    <span className={`font-bold font-mono text-sm ${isMe ? 'text-g-yellow' : 'text-g-blue'}`}>
-                      {entry.points.toLocaleString()}
-                    </span>
-                  </td>
-                </tr>
-              );
-            })}
+                    <div>
+                      <div className="text-sm text-white font-medium">{entry.name}</div>
+                      <Badge variant={getBadgeColor(entry.badge)} className="mt-0.5 text-[10px] py-0 capitalize">{entry.badge.replace('-', ' ')}</Badge>
+                    </div>
+                  </div>
+                </td>
+                <td className="text-right hidden sm:table-cell">
+                  <div className="flex items-center justify-end gap-1 text-g-blue font-mono text-sm">
+                    <Star size={10} />{entry.points.toLocaleString()}
+                  </div>
+                </td>
+              </tr>
+            ))}
           </tbody>
         </table>
       </div>

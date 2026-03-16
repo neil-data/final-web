@@ -1,6 +1,24 @@
+"use client";
+
+import { useEffect, useState } from 'react';
 import { GlassCard } from '@/components/ui/GlassCard';
 
+const MAINTENANCE_KEY = 'gdgoc-maintenance-mode';
+
 export default function AdminSettingsPage() {
+  const [maintenanceMode, setMaintenanceMode] = useState(false);
+
+  useEffect(() => {
+    const current = window.localStorage.getItem(MAINTENANCE_KEY) === 'on';
+    setMaintenanceMode(current);
+  }, []);
+
+  const updateMaintenanceMode = (enabled: boolean) => {
+    setMaintenanceMode(enabled);
+    window.localStorage.setItem(MAINTENANCE_KEY, enabled ? 'on' : 'off');
+    window.dispatchEvent(new Event('maintenance-mode-changed'));
+  };
+
   return (
     <div className="p-6 md:p-8 max-w-3xl mx-auto">
       <div className="mb-8">
@@ -64,6 +82,41 @@ export default function AdminSettingsPage() {
               </div>
             ))}
           </div>
+        </GlassCard>
+
+        {/* Maintenance */}
+        <GlassCard animate={false}>
+          <h2 className="section-number mb-5">Maintenance Mode</h2>
+          <p className="text-white/45 text-sm mb-5">
+            Turn this on to temporarily show a maintenance page to public and student routes.
+          </p>
+          <div className="flex gap-3">
+            <button
+              type="button"
+              onClick={() => updateMaintenanceMode(true)}
+              className={`btn-skew text-xs font-mono uppercase tracking-widest px-6 py-2.5 transition-all ${
+                maintenanceMode
+                  ? 'bg-g-red border border-g-red text-white'
+                  : 'bg-transparent border border-white/15 text-white/60 hover:border-white/30'
+              }`}
+            >
+              <span>ON</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => updateMaintenanceMode(false)}
+              className={`btn-skew text-xs font-mono uppercase tracking-widest px-6 py-2.5 transition-all ${
+                !maintenanceMode
+                  ? 'bg-g-green border border-g-green text-white'
+                  : 'bg-transparent border border-white/15 text-white/60 hover:border-white/30'
+              }`}
+            >
+              <span>OFF</span>
+            </button>
+          </div>
+          <p className="text-xs font-mono uppercase tracking-widest mt-4 text-white/35">
+            Current Status: {maintenanceMode ? 'ON' : 'OFF'}
+          </p>
         </GlassCard>
 
         <div className="flex gap-3">

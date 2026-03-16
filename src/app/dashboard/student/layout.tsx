@@ -1,7 +1,7 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { LayoutDashboard, Calendar, Trophy, Users, Image, User, ChevronLeft, Home, LogOut, Menu, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -21,8 +21,19 @@ const GOOGLE_COLORS = ['#4285F4', '#EA4335', '#FBBC05', '#34A853'];
 
 export default function StudentDashboardLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const router = useRouter();
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+
+  useEffect(() => {
+    const session = localStorage.getItem('gdgoc-student-session');
+    if (!session) router.replace('/login');
+  }, [router]);
+
+  const handleLogout = () => {
+    localStorage.removeItem('gdgoc-student-session');
+    router.push('/login');
+  };
 
   return (
     <div className="min-h-screen bg-[#030303] flex">
@@ -76,10 +87,10 @@ export default function StudentDashboardLayout({ children }: { children: React.R
             <Home size={16} />
             {!collapsed && <span>Back to Site</span>}
           </Link>
-          <Link href="/login" className={cn('sidebar-link', collapsed && 'justify-center px-2')} title={collapsed ? 'Logout' : undefined}>
+          <button onClick={handleLogout} className={cn('sidebar-link w-full', collapsed && 'justify-center px-2')} title={collapsed ? 'Logout' : undefined}>
             <LogOut size={16} />
             {!collapsed && <span>Logout</span>}
-          </Link>
+          </button>
         </div>
       </aside>
 
@@ -120,6 +131,16 @@ export default function StudentDashboardLayout({ children }: { children: React.R
                   </Link>
                 ))}
               </nav>
+              <div className="mt-6 pt-4 border-t border-white/10 space-y-1">
+                <Link href="/" className="sidebar-link" onClick={() => setMobileOpen(false)}>
+                  <Home size={16} />
+                  <span>Back to Site</span>
+                </Link>
+                <button onClick={handleLogout} className="sidebar-link w-full">
+                  <LogOut size={16} />
+                  <span>Logout</span>
+                </button>
+              </div>
             </motion.div>
           </motion.div>
         )}

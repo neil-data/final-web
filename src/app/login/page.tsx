@@ -9,11 +9,14 @@ import { Eye, EyeOff, ArrowRight } from 'lucide-react';
 export default function LoginPage() {
   const router = useRouter();
   const [showPass, setShowPass] = useState(false);
+  const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    const displayName = name.trim() || email.split('@')[0];
+    localStorage.setItem('gdgoc-student-session', JSON.stringify({ name: displayName, email }));
     router.push('/dashboard/student/overview');
   };
 
@@ -58,6 +61,21 @@ export default function LoginPage() {
               onSubmit={handleSubmit}
               className="space-y-4"
             >
+              {/* Full Name */}
+              <div>
+                <label className="block text-xs font-mono uppercase tracking-widest text-white/40 mb-2">
+                  Full Name
+                </label>
+                <input
+                  type="text"
+                  value={name}
+                  onChange={e => setName(e.target.value)}
+                  placeholder="Your full name"
+                  className="form-input"
+                  autoComplete="name"
+                />
+              </div>
+
               {/* Email */}
               <div>
                 <label className="block text-xs font-mono uppercase tracking-widest text-white/40 mb-2">

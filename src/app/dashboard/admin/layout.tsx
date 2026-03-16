@@ -1,7 +1,7 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   LayoutDashboard, Calendar, Users, Trophy, Image, Megaphone,
@@ -28,9 +28,21 @@ const GOOGLE_COLORS = ['#4285F4', '#EA4335', '#FBBC05', '#34A853'];
 
 function AdminDashboardContent({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const router = useRouter();
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const { currentRole } = useAdminAuth();
+
+  useEffect(() => {
+    const session = localStorage.getItem('gdgoc-admin-session');
+    if (!session) router.replace('/admin');
+  }, [router]);
+
+  const handleLogout = () => {
+    localStorage.removeItem('gdgoc-admin-session');
+    localStorage.removeItem('adminRole');
+    router.push('/admin');
+  };
 
   const allowedModules = getModulesForRole(currentRole);
   const visibleNav = ALL_ADMIN_NAV.filter(n => allowedModules.includes(n.module));
@@ -91,10 +103,10 @@ function AdminDashboardContent({ children }: { children: React.ReactNode }) {
             <Home size={16} />
             {!collapsed && <span>Back to Site</span>}
           </Link>
-          <Link href="/login" className={cn('sidebar-link', collapsed && 'justify-center px-2')}>
+          <button onClick={handleLogout} className={cn('sidebar-link w-full', collapsed && 'justify-center px-2')}>
             <LogOut size={16} />
             {!collapsed && <span>Logout</span>}
-          </Link>
+          </button>
         </div>
       </aside>
 
@@ -139,6 +151,16 @@ function AdminDashboardContent({ children }: { children: React.ReactNode }) {
                   </Link>
                 ))}
               </nav>
+              <div className="mt-6 pt-4 border-t border-white/10 space-y-1">
+                <Link href="/" className="sidebar-link" onClick={() => setMobileOpen(false)}>
+                  <Home size={16} />
+                  <span>Back to Site</span>
+                </Link>
+                <button onClick={handleLogout} className="sidebar-link w-full">
+                  <LogOut size={16} />
+                  <span>Logout</span>
+                </button>
+              </div>
             </motion.div>
           </motion.div>
         )}

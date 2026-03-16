@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
@@ -18,12 +18,18 @@ export default function LoginPage() {
 
   const isAdmin = tab === 'admin';
 
+  // If already logged in, skip the login page
+  useEffect(() => {
+    const adminSession = localStorage.getItem('gdgoc-admin-session');
+    if (adminSession) router.replace('/dashboard/admin/overview');
+  }, [router]);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (isAdmin) {
-      if (typeof window !== 'undefined') {
-        localStorage.setItem('adminRole', role);
-      }
+      const displayName = email.split('@')[0];
+      localStorage.setItem('adminRole', role);
+      localStorage.setItem('gdgoc-admin-session', JSON.stringify({ name: displayName, email, role }));
       router.push('/dashboard/admin/overview');
     } else {
       router.push('/dashboard/student/overview');

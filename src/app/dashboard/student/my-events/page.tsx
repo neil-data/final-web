@@ -6,8 +6,7 @@ import { mockEvents } from '@/data/events';
 import { getCategoryColor, getStatusColor, formatDateShort } from '@/lib/utils';
 import { Calendar, MapPin, Clock } from 'lucide-react';
 
-const myEvents = mockEvents.slice(0, 3);
-const upcomingEvents = mockEvents.filter(e => e.status !== 'completed').slice(0, 5);
+const upcomingEvents = mockEvents.filter(e => e.status !== 'completed').slice(0, 6);
 
 export default function StudentMyEventsPage() {
   return (
@@ -21,33 +20,16 @@ export default function StudentMyEventsPage() {
         {/* Registered events */}
         <div>
           <h2 className="section-number mb-4">Registered Events</h2>
-          <div className="space-y-3">
-            {myEvents.map((event, i) => (
-              <GlassCard key={event.id} delay={i * 0.06} className="flex gap-4 py-4 px-5">
-                <div className="relative w-16 h-16 rounded-lg overflow-hidden flex-shrink-0">
-                  <Image src={event.banner} alt={event.title} fill className="object-cover" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex flex-wrap gap-2 mb-1.5">
-                    <Badge variant={getCategoryColor(event.category)}>{event.category}</Badge>
-                    <Badge variant={getStatusColor(event.status)}>{event.status.replace('-', ' ')}</Badge>
-                  </div>
-                  <h3 className="font-semibold text-white text-sm mb-1 truncate">{event.title}</h3>
-                  <div className="flex flex-wrap gap-3 text-xs font-mono text-white/35">
-                    <span className="flex items-center gap-1"><Calendar size={10} />{formatDateShort(event.date)}</span>
-                    <span className="flex items-center gap-1"><Clock size={10} />{event.time}</span>
-                    <span className="flex items-center gap-1"><MapPin size={10} />{event.location}</span>
-                  </div>
-                </div>
-                <Link href={`/events/${event.id}`} className="text-xs font-mono text-g-blue hover:text-white flex-shrink-0 self-center">Details →</Link>
-              </GlassCard>
-            ))}
+          <div className="flex flex-col items-center justify-center py-12 text-center glass-card rounded-xl border border-white/5">
+            <Calendar size={28} className="text-white/10 mb-3" />
+            <p className="text-white/30 text-sm font-mono">You haven&apos;t registered for any events yet.</p>
+            <p className="text-white/20 text-xs font-mono mt-1">Browse upcoming events below to get started.</p>
           </div>
         </div>
 
         {/* More upcoming */}
         <div>
-          <h2 className="section-number mb-4">Upcoming Events (All)</h2>
+          <h2 className="section-number mb-4">Upcoming Events</h2>
           <div className="grid sm:grid-cols-2 gap-4">
             {upcomingEvents.map((event, i) => (
               <GlassCard key={event.id} delay={i * 0.07} className="flex gap-3 py-3 px-4">
@@ -55,10 +37,18 @@ export default function StudentMyEventsPage() {
                   <Image src={event.banner} alt={event.title} fill className="object-cover" />
                 </div>
                 <div className="flex-1 min-w-0">
+                  <div className="flex flex-wrap gap-1 mb-1">
+                    <Badge variant={getCategoryColor(event.category)} className="text-[10px] py-0">{event.category}</Badge>
+                    <Badge variant={getStatusColor(event.status)} className="text-[10px] py-0">{event.status.replace('-', ' ')}</Badge>
+                  </div>
                   <div className="text-sm font-medium text-white truncate mb-0.5">{event.title}</div>
-                  <div className="text-xs text-white/35 font-mono">{formatDateShort(event.date)}</div>
+                  <div className="flex flex-wrap gap-2 text-[10px] font-mono text-white/35">
+                    <span className="flex items-center gap-0.5"><Calendar size={9} />{formatDateShort(event.date)}</span>
+                    <span className="flex items-center gap-0.5"><Clock size={9} />{event.time}</span>
+                    <span className="flex items-center gap-0.5"><MapPin size={9} />{event.location}</span>
+                  </div>
                 </div>
-                <Link href={`/events/${event.id}`} className="text-xs font-mono text-g-blue flex-shrink-0 self-center text-[10px]">View →</Link>
+                <Link href={`/events/${event.id}`} className="text-xs font-mono text-g-blue hover:text-white self-center flex-shrink-0">Details →</Link>
               </GlassCard>
             ))}
           </div>

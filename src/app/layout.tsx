@@ -1,8 +1,6 @@
 import type { Metadata } from 'next';
 import './globals.css';
-import Navbar from '@/components/layout/Navbar';
-import Footer from '@/components/layout/Footer';
-import Chatbot from '@/components/Chatbot';
+import AppShell from '@/components/layout/AppShell';
 
 export const metadata: Metadata = {
   title: 'GDGOC IAR — Google Developer Groups On Campus',
@@ -22,12 +20,7 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
       </head>
       <body className="bg-dark-bg text-white antialiased viewport-glow">
-        <Navbar />
-        <main className="min-h-screen">
-          {children}
-        </main>
-        <Footer />
-        <Chatbot />
+        <AppShell>{children}</AppShell>
       </body>
     </html>
   );
