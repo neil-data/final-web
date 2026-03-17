@@ -1,10 +1,10 @@
 'use client';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { GoogleAuthProvider, signInWithPopup, signOut } from 'firebase/auth';
+import { GoogleAuthProvider, getRedirectResult, signInWithPopup, signInWithRedirect, signOut } from 'firebase/auth';
 import { Eye, EyeOff, ArrowRight } from 'lucide-react';
 import { getFirebaseAuth } from '@/lib/firebaseClient';
 
@@ -12,6 +12,19 @@ const normalizeEmail = (value: string) => value.trim().toLowerCase();
 const isIarEmail = (value: string) => {
   const clean = normalizeEmail(value);
   return clean.endsWith('@iar.ac.in') && clean.indexOf('@') === clean.lastIndexOf('@') && clean.indexOf('@') > 0;
+};
+
+const getAuthErrorMessage = (error: unknown) => {
+  const code = typeof error === 'object' && error !== null && 'code' in error
+    ? String((error as { code?: string }).code)
+    : '';
+
+  if (code.includes('auth/popup-blocked')) return 'Popup was blocked by browser. Continuing with redirect sign-in...';
+  if (code.includes('auth/popup-closed-by-user')) return 'Google sign-in was closed before completion.';
+  if (code.includes('auth/unauthorized-domain')) return 'This domain is not authorized in Firebase Auth settings.';
+  if (code.includes('auth/operation-not-allowed')) return 'Google provider is not enabled in Firebase Auth.';
+  if (code.includes('auth/invalid-api-key')) return 'Firebase API key is invalid.';
+  return 'Google sign-in failed. Please try again.';
 };
 
 export default function LoginPage() {
@@ -29,6 +42,32 @@ export default function LoginPage() {
     localStorage.setItem('gdgoc-student-session', JSON.stringify({ name: displayName, email: cleanEmail }));
     router.push('/dashboard/student/overview');
   };
+
+  useEffect(() => {
+    const handleRedirectResult = async () => {
+      try {
+        const auth = getFirebaseAuth();
+        const result = await getRedirectResult(auth);
+        const redirectEmail = normalizeEmail(result?.user?.email || '');
+
+        if (!redirectEmail) return;
+
+        if (!isIarEmail(redirectEmail)) {
+          await signOut(auth);
+          setError('Google sign-in is only allowed for @iar.ac.in accounts.');
+          return;
+        }
+
+        if (!name.trim() && result?.user?.displayName) setName(result.user.displayName);
+        setEmail(redirectEmail);
+        signInStudent(redirectEmail);
+      } catch (error) {
+        setError(getAuthErrorMessage(error));
+      }
+    };
+
+    void handleRedirectResult();
+  }, [name, router]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -67,8 +106,22 @@ export default function LoginPage() {
 
       setEmail(googleEmail);
       signInStudent(googleEmail);
-    } catch {
-      setError('Google sign-in failed. Please try again.');
+    } catch (error) {
+      const message = getAuthErrorMessage(error);
+
+      if (message.includes('Continuing with redirect')) {
+        try {
+          const auth = getFirebaseAuth();
+          const provider = new GoogleAuthProvider();
+          provider.setCustomParameters({ prompt: 'select_account', hd: 'iar.ac.in' });
+          await signInWithRedirect(auth, provider);
+          return;
+        } catch (redirectError) {
+          setError(getAuthErrorMessage(redirectError));
+        }
+      } else {
+        setError(message);
+      }
     } finally {
       setGoogleLoading(false);
     }
