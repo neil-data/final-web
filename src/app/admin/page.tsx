@@ -12,9 +12,14 @@ import { BackendApiError } from '@/lib/backendApi';
 import { hasAuthToken, loginAdmin } from '@/lib/auth';
 
 const normalizeEmail = (value: string) => value.trim().toLowerCase();
+const ROOT_ADMIN_EMAIL = 'gdgociar26@gmail.com';
 const isIarEmail = (value: string) => {
   const clean = normalizeEmail(value);
   return clean.endsWith('@iar.ac.in') && clean.indexOf('@') === clean.lastIndexOf('@') && clean.indexOf('@') > 0;
+};
+const isAllowedAdminEmail = (value: string) => {
+  const clean = normalizeEmail(value);
+  return clean === ROOT_ADMIN_EMAIL || isIarEmail(clean);
 };
 
 export default function LoginPage() {
@@ -33,16 +38,20 @@ export default function LoginPage() {
     }
   }, [router]);
 
-  const signIn = async (signInEmail: string) => {
+  const signIn = async (signInEmail: string, signInPassword: string) => {
     const cleanEmail = normalizeEmail(signInEmail);
-    await loginAdmin({ email: cleanEmail, role: role as AdminRole });
+    await loginAdmin({ email: cleanEmail, password: signInPassword, role: role as AdminRole });
     router.push('/dashboard/admin/overview');
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!isIarEmail(email)) {
-      setError('Please use your @iar.ac.in email.');
+    if (!isAllowedAdminEmail(email)) {
+      setError('Use your authorized admin email.');
+      return;
+    }
+    if (!password.trim()) {
+      setError('Password is required.');
       return;
     }
 
@@ -50,7 +59,7 @@ export default function LoginPage() {
 
     try {
       setSubmitLoading(true);
-      await signIn(email);
+      await signIn(email, password);
     } catch (err) {
       if (err instanceof BackendApiError) {
         setError(err.message);
@@ -77,14 +86,14 @@ export default function LoginPage() {
       const result = await signInWithPopup(auth, provider);
       const googleEmail = normalizeEmail(result.user.email || '');
 
-      if (!isIarEmail(googleEmail)) {
+      if (!isAllowedAdminEmail(googleEmail)) {
         await signOut(auth);
-        setError('Google sign-in is only allowed for @iar.ac.in accounts.');
+        setError('Google sign-in is allowed only for authorized admin accounts.');
         return;
       }
 
       setEmail(googleEmail);
-      await signIn(googleEmail);
+      await signIn(googleEmail, password);
     } catch (err) {
       if (err instanceof BackendApiError) {
         setError(err.message);

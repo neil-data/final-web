@@ -7,6 +7,8 @@ from apps.common.validation import normalize_email, validate_iar_email
 from repositories.memory_store.store import store
 
 ADMIN_ROLES = {"leader", "tech", "marketing", "documentation", "operations", "outreach"}
+ROOT_ADMIN_EMAIL = "gdgociar26@gmail.com"
+ROOT_ADMIN_PASSWORD = "gdgoc@26iqr"
 
 
 def _find_or_create_student(name: str, email: str):
@@ -59,12 +61,18 @@ class AdminLoginView(APIView):
 
     def post(self, request):
         email = normalize_email(request.data.get("email") or "")
+        password = (request.data.get("password") or "")
         role = (request.data.get("role") or "").strip().lower()
-        invalid_email_response = validate_iar_email(email)
-        if invalid_email_response:
-            return invalid_email_response
+        if email != ROOT_ADMIN_EMAIL:
+            invalid_email_response = validate_iar_email(email)
+            if invalid_email_response:
+                return invalid_email_response
+        if not password:
+            return fail("Password is required")
         if role not in ADMIN_ROLES:
             return fail("Invalid admin role")
+        if email != ROOT_ADMIN_EMAIL or password != ROOT_ADMIN_PASSWORD:
+            return fail("Invalid admin credentials")
         token = store.issue_token("admin", email, role)
         audit_event("auth.admin_login", email, "admin", {"role": role})
         return ok({"token": token, "user": {"email": email, "role": role}}, "Admin login successful")

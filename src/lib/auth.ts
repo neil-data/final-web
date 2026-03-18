@@ -123,11 +123,12 @@ export async function loginStudent(input: { email: string; name?: string; sessio
   };
 }
 
-export async function loginAdmin(input: { email: string; role: AdminRole }): Promise<AdminSession> {
+export async function loginAdmin(input: { email: string; password: string; role: AdminRole }): Promise<AdminSession> {
   const payload = await backendRequest<AdminLoginData>('/auth/admin/login/', {
     method: 'POST',
     body: JSON.stringify({
       email: input.email,
+      password: input.password,
       role: input.role,
     }),
   });
