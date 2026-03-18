@@ -1,0 +1,20 @@
+{"timestamp": "2026-03-17T12:23:57.914757Z", "action": "auth.admin_login", "actor": "leader@iar.ac.in", "target": "admin", "metadata": {"role": "leader"}}
+{"timestamp": "2026-03-17T12:23:57.937936Z", "action": "settings.update", "actor": "leader@iar.ac.in", "target": "platform_settings", "metadata": {}}
+{"timestamp": "2026-03-17T17:28:13.952288Z", "action": "auth.student_login", "actor": "chidatmajpatel_btce2025@iar.ac.in", "target": "u3", "metadata": {"role": "student"}}
+{"timestamp": "2026-03-17T17:29:49.039760Z", "action": "auth.logout", "actor": "chidatmajpatel_btce2025@iar.ac.in", "target": "u3", "metadata": {"role": "student"}}
+{"timestamp": "2026-03-17T17:29:58.537660Z", "action": "auth.student_login", "actor": "chidatmajpatel_btce2025@iar.ac.in", "target": "u3", "metadata": {"role": "student"}}
+{"timestamp": "2026-03-17T18:09:00.468929Z", "action": "auth.logout", "actor": "chidatmajpatel_btce2025@iar.ac.in", "target": "u3", "metadata": {"role": "student"}}
+{"timestamp": "2026-03-17T18:09:10.579299Z", "action": "auth.student_login", "actor": "chidatmajpatel_btce2025@iar.ac.in", "target": "u3", "metadata": {"role": "student"}}
+{"timestamp": "2026-03-17T18:09:22.145872Z", "action": "auth.logout", "actor": "chidatmajpatel_btce2025@iar.ac.in", "target": "u3", "metadata": {"role": "student"}}
+{"timestamp": "2026-03-17T18:09:32.953297Z", "action": "auth.student_login", "actor": "chidatmajpatel_btce2025@iar.ac.in", "target": "u3", "metadata": {"role": "student"}}
+{"timestamp": "2026-03-17T18:12:32.083082Z", "action": "users.update", "actor": "chidatmajpatel_btce2025@iar.ac.in", "target": "u3", "metadata": {"fields": ["name", "iarNo", "department", "year", "phone", "bio", "github", "linkedin"]}}
+{"timestamp": "2026-03-17T18:12:32.921497Z", "action": "users.update", "actor": "chidatmajpatel_btce2025@iar.ac.in", "target": "u3", "metadata": {"fields": ["name", "iarNo", "department", "year", "phone", "bio", "github", "linkedin"]}}
+{"timestamp": "2026-03-17T18:12:34.201014Z", "action": "users.update", "actor": "chidatmajpatel_btce2025@iar.ac.in", "target": "u3", "metadata": {"fields": ["name", "iarNo", "department", "year", "phone", "bio", "github", "linkedin"]}}
+{"timestamp": "2026-03-17T18:15:30.755394Z", "action": "auth.logout", "actor": "chidatmajpatel_btce2025@iar.ac.in", "target": "u3", "metadata": {"role": "student"}}
+{"timestamp": "2026-03-17T18:16:34.110044Z", "action": "auth.student_login", "actor": "chidatmajpatel_btce2025@iar.ac.in", "target": "u3", "metadata": {"role": "student"}}
+{"timestamp": "2026-03-17T18:20:31.217589Z", "action": "auth.logout", "actor": "chidatmajpatel_btce2025@iar.ac.in", "target": "u3", "metadata": {"role": "student"}}
+{"timestamp": "2026-03-17T18:20:51.769279Z", "action": "auth.student_login", "actor": "chidatmajpatel_btce2025@iar.ac.in", "target": "u3", "metadata": {"role": "student"}}
+{"timestamp": "2026-03-17T18:29:05.519038Z", "action": "auth.student_login", "actor": "chidatmajpatel_btce2025@iar.ac.in", "target": "u1", "metadata": {"role": "student"}}
+{"timestamp": "2026-03-17T18:30:13.000573Z", "action": "auth.logout", "actor": "chidatmajpatel_btce2025@iar.ac.in", "target": "u1", "metadata": {"role": "student"}}
+{"timestamp": "2026-03-17T18:32:43.086554Z", "action": "auth.student_login", "actor": "chidatmajpatel_btce2025@iar.ac.in", "target": "u1", "metadata": {"role": "student"}}
+{"timestamp": "2026-03-17T18:33:46.006340Z", "action": "auth.student_login", "actor": "chidatmajpatel_btce2025@iar.ac.in", "target": "u1", "metadata": {"role": "student"}}

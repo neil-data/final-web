@@ -1,0 +1,231 @@
+'use client';
+import { useState, useEffect } from 'react';
+import Link from 'next/link';
+import Image from 'next/image';
+import { useRouter } from 'next/navigation';
+import { motion, AnimatePresence } from 'framer-motion';
+import { GoogleAuthProvider, signInWithPopup, signOut } from 'firebase/auth';
+import { Eye, EyeOff, ArrowRight, ShieldCheck } from 'lucide-react';
+import { getFirebaseAuth } from '@/lib/firebaseClient';
+import { AdminRole } from '@/types';
+import { BackendApiError } from '@/lib/backendApi';
+import { hasAuthToken, loginAdmin } from '@/lib/auth';
+
+const normalizeEmail = (value: string) => value.trim().toLowerCase();
+const isIarEmail = (value: string) => {
+  const clean = normalizeEmail(value);
+  return clean.endsWith('@iar.ac.in') && clean.indexOf('@') === clean.lastIndexOf('@') && clean.indexOf('@') > 0;
+};
+
+export default function LoginPage() {
+  const router = useRouter();
+  const [showPass, setShowPass] = useState(false);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [role, setRole] = useState('leader');
+  const [error, setError] = useState('');
+  const [googleLoading, setGoogleLoading] = useState(false);
+  const [submitLoading, setSubmitLoading] = useState(false);
+
+  useEffect(() => {
+    if (hasAuthToken()) {
+      router.replace('/dashboard/admin/overview');
+    }
+  }, [router]);
+
+  const signIn = async (signInEmail: string) => {
+    const cleanEmail = normalizeEmail(signInEmail);
+    await loginAdmin({ email: cleanEmail, role: role as AdminRole });
+    router.push('/dashboard/admin/overview');
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!isIarEmail(email)) {
+      setError('Please use your @iar.ac.in email.');
+      return;
+    }
+
+    setError('');
+
+    try {
+      setSubmitLoading(true);
+      await signIn(email);
+    } catch (err) {
+      if (err instanceof BackendApiError) {
+        setError(err.message);
+      } else {
+        setError('Sign-in failed. Please try again.');
+      }
+    } finally {
+      setSubmitLoading(false);
+    }
+  };
+
+  const handleGoogleSignIn = async () => {
+    setGoogleLoading(true);
+    setError('');
+
+    try {
+      const auth = getFirebaseAuth();
+      const provider = new GoogleAuthProvider();
+      provider.setCustomParameters({
+        prompt: 'select_account',
+        hd: 'iar.ac.in',
+      });
+
+      const result = await signInWithPopup(auth, provider);
+      const googleEmail = normalizeEmail(result.user.email || '');
+
+      if (!isIarEmail(googleEmail)) {
+        await signOut(auth);
+        setError('Google sign-in is only allowed for @iar.ac.in accounts.');
+        return;
+      }
+
+      setEmail(googleEmail);
+      await signIn(googleEmail);
+    } catch (err) {
+      if (err instanceof BackendApiError) {
+        setError(err.message);
+      } else {
+        setError('Google sign-in failed. Please try again.');
+      }
+    } finally {
+      setGoogleLoading(false);
+    }
+  };
+
+  return (
+    <div className="min-h-screen flex items-center justify-center relative overflow-hidden bg-dark-bg">
+      <div className="absolute inset-0 dot-grid opacity-20" />
+      <div className="absolute inset-0 bg-gradient-radial from-g-red/5 via-transparent to-transparent" />
+
+      <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-g-blue/5 rounded-full blur-3xl" />
+      <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-g-red/5 rounded-full blur-3xl" />
+
+      <div className="relative z-10 w-full max-w-md mx-auto px-4">
+        <div className="text-center mb-10">
+          <Link href="/" className="inline-flex items-center gap-2.5 mb-4">
+            <Image
+              src="/logo.png"
+              alt="GDGOC IAR logo"
+              width={30}
+              height={30}
+              className="rounded-sm"
+              priority
+            />
+            <span className="font-heading font-bold text-white text-sm tracking-wide">
+              GDGOC × <span className="text-g-red">ADMIN</span>
+            </span>
+          </Link>
+          <h1 className="font-heading text-2xl font-bold text-white mt-2">Admin Access</h1>
+          <p className="text-white/40 text-sm mt-1">Sign in to manage the platform</p>
+        </div>
+
+        <div className="glass-card rounded-2xl p-8 glow-border-red">
+          <AnimatePresence mode="wait">
+            <motion.form
+              key="admin"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.2 }}
+              onSubmit={handleSubmit}
+              className="space-y-4"
+            >
+              <div>
+                <label className="block text-xs font-mono uppercase tracking-widest text-white/40 mb-2">Admin Email</label>
+                <input
+                  type="email"
+                  value={email}
+                  onChange={e => {
+                    setEmail(e.target.value);
+                    if (error) setError('');
+                  }}
+                  placeholder="admin@iar.ac.in"
+                  className="form-input"
+                  autoComplete="email"
+                  required
+                />
+              </div>
+
+              {error && <p className="text-xs text-g-red font-mono">{error}</p>}
+
+              <div>
+                <label className="block text-xs font-mono uppercase tracking-widest text-white/40 mb-2">Admin Role</label>
+                <select
+                  value={role}
+                  onChange={e => setRole(e.target.value)}
+                  className="form-input"
+                >
+                  <option value="leader" className="bg-dark-card">Leader (Full Access)</option>
+                  <option value="tech" className="bg-dark-card">Tech</option>
+                  <option value="marketing" className="bg-dark-card">Marketing</option>
+                  <option value="documentation" className="bg-dark-card">Documentation</option>
+                  <option value="operations" className="bg-dark-card">Operations</option>
+                  <option value="outreach" className="bg-dark-card">Outreach</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-xs font-mono uppercase tracking-widest text-white/40 mb-2">Password</label>
+                <div className="relative">
+                  <input
+                    type={showPass ? 'text' : 'password'}
+                    value={password}
+                    onChange={e => setPassword(e.target.value)}
+                    placeholder="••••••••••"
+                    className="form-input pr-10"
+                    autoComplete="current-password"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPass(!showPass)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-white/30 hover:text-white transition-colors"
+                  >
+                    {showPass ? <EyeOff size={14} /> : <Eye size={14} />}
+                  </button>
+                </div>
+              </div>
+
+              <button
+                type="submit"
+                disabled={submitLoading}
+                className="btn-skew w-full text-center block text-white text-xs font-mono uppercase tracking-widest py-3.5 transition-all bg-g-red border border-g-red hover:bg-g-red/80"
+              >
+                <span className="flex items-center justify-center gap-2">
+                  <ShieldCheck size={13} /> {submitLoading ? 'Signing in...' : 'Access Admin Dashboard'}
+                  <ArrowRight size={13} />
+                </span>
+              </button>
+
+              <div className="flex items-center gap-3 my-2">
+                <div className="flex-1 h-px bg-white/6" />
+                <span className="text-white/25 text-xs font-mono">OR</span>
+                <div className="flex-1 h-px bg-white/6" />
+              </div>
+
+              <button
+                type="button"
+                onClick={handleGoogleSignIn}
+                disabled={googleLoading}
+                className="w-full flex items-center justify-center gap-3 py-3 rounded border border-white/10 hover:border-white/25 hover:bg-white/3 transition-all text-sm text-white/70"
+              >
+                <svg width="16" height="16" viewBox="0 0 48 48" fill="none">
+                  <path d="M47.532 24.552c0-1.636-.142-3.21-.408-4.728H24v9.013h13.204c-.569 3.067-2.298 5.669-4.892 7.414v6.164h7.92c4.635-4.272 7.3-10.567 7.3-17.863z" fill="#4285F4"/>
+                  <path d="M24 48c6.636 0 12.198-2.202 16.264-5.972l-7.92-6.163c-2.194 1.47-5.001 2.338-8.344 2.338-6.418 0-11.854-4.337-13.8-10.167H2.012v6.364C6.06 43.117 14.452 48 24 48z" fill="#34A853"/>
+                  <path d="M10.2 28.036A14.478 14.478 0 019.456 24c0-1.41.242-2.78.744-4.036v-6.364H2.012A23.989 23.989 0 000 24c0 3.87.927 7.526 2.012 10.4l8.188-6.364z" fill="#FBBC05"/>
+                  <path d="M24 9.576c3.623 0 6.868 1.246 9.422 3.692l7.073-7.073C36.19 2.381 30.628 0 24 0 14.452 0 6.06 4.883 2.012 13.6l8.188 6.364C12.146 13.913 17.582 9.576 24 9.576z" fill="#EA4335"/>
+                </svg>
+                {googleLoading ? 'Signing in...' : 'Continue with Google'}
+              </button>
+            </motion.form>
+          </AnimatePresence>
+        </div>
+
+        <p className="text-center text-white/20 text-xs font-mono mt-6">© 2025 GDGOC IAR Admin</p>
+      </div>
+    </div>
+  );
+}
